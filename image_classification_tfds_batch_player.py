@@ -38,7 +38,10 @@ class image_classification_tfds_batch_player:
         try:
             self.alert("Downloading the %s dataset"%self.dataset,"INFO")
             self.ds, self.info=tfds.load(self.dataset, split=self.split, shuffle_files=self.shuffle, with_info=True)
-            self.ds = self.ds.repeat().shuffle(self.info.splits[self.split].num_examples).batch(self.batch_size)
+            if self.loop:
+                self.ds = self.ds.repeat().shuffle(self.info.splits[self.split].num_examples,seed=0).batch(self.batch_size)
+            else:
+                self.ds = self.ds.shuffle(self.info.splits[self.split].num_examples).batch(self.batch_size)
             self.alert("%s dataset is downloaded successfully"%self.dataset,"INFO")        
         except ValueError as error:
             self.alert("This split you chose is not available. Please check the available splits at https://www.tensorflow.org/datasets/catalog/overview","ERROR")
@@ -47,6 +50,7 @@ class image_classification_tfds_batch_player:
     def run(self):
         while True:
             if self.play==True:
+                self.play=False
                 # `tfds.as_numpy` converts `tf.Tensor` -> `np.array`
                 for ex in tfds.as_numpy(self.ds):
                     start=time.time()
@@ -74,7 +78,7 @@ class image_classification_tfds_batch_player:
                     self.publish("labels",labels_msg)
                     end=time.time()-start
                     if (1.0/self.get_property("frame_rate")) > end:
-                        time.sleep((1.0/self.get_property("frame_rate"))-end)               
+                        time.sleep((1.0/self.get_property("frame_rate"))-end)             
 
             time.sleep(0.001)
             
