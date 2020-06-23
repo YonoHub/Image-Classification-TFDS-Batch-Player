@@ -1,7 +1,7 @@
 '''
     Image Classification TFDS Batch Player Block's source code
     Auther: Ahmed Hendawy - YonoHub Developer Advocate
-    Date: 01.06.2020
+    Date: 23.06.2020
 '''
 
 # Tensorflow Datasets
